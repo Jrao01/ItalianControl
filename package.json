@@ -1,7 +1,7 @@
 {
   "name": "phaserconfig",
   "version": "1.0.0",
-  "description": "",
+  "description": "a missile control remake inspired by the italian brainrot memes, coded by Codign JAR A.K.A JAMER",
   "main": "index.js",
   "scripts": {
     "start": "nodemon app.js"

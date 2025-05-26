@@ -1,20 +1,26 @@
 import GameOver from "./gameOver.js"
-import Nivel2 from "./scene2.js"
+import Win from "./win.js"
 
-class Nivel1 extends Phaser.Scene {
+class Nivel2 extends Phaser.Scene {
     constructor(){
-        super({key:"Nivel1"});
+        super({key:"Nivel2"});
         this.boxWidth = 0;
         this.landscapeWidth = 0;
         this.miniboxW = 0;
         this.chimpSpeed = -150; // Velocidad hacia arriba
         this.respawnY = this.scale?.height - 10 || 800; // Posición de reaparecer
-         this.bombardiroSpeed = 300; // Velocidad de movimiento horizontal
+         this.bombardiroSpeed = 500; // Velocidad de movimiento horizontal
     this.minX = 0; // Mismo límite izquierdo que aim0
     this.maxX = 0; // Mismo límite derecho que aim0
     this.Points = 0
     this.tralalerosKilled = 0
     this.bombardirosKilled = 0
+    }
+
+       init(data) {
+        // Accede a los datos mediante data.nombreParametro
+        this.Points += data.score;
+        console.log(`Puntuación final: ${this.finalScore}`);
     }
 
     preload() {
@@ -26,7 +32,6 @@ class Nivel1 extends Phaser.Scene {
         this.load.image("tralalero","./assets/tralalero.png");
         this.load.image("aim0","./assets/aim2.png");
         this.load.image("chimpanzini","./assets/chimpanzini.png");
-        this.load.image("bombardiro","./assets/bombardiro.png");
         this.load.image("glorbo","./assets/glorbo.png")
         this.load.image("Nikess","./assets/tralalerodead.png")
         this.load.audio("explodes","./assets/Impact15.wav")
@@ -35,6 +40,7 @@ class Nivel1 extends Phaser.Scene {
         this.load.audio("drop","./assets/drop.wav")
         this.load.audio("Chimp","./assets/chimpS.mp3");
         this.load.audio("upgrade","./assets/uplong.wav")
+        this.load.image("gussini","./assets/bombardini.png")
     }
 
     create() {
@@ -84,6 +90,26 @@ class Nivel1 extends Phaser.Scene {
         this.box10 = this.add.image(0, 0, "box").setScale(0.243);
         this.box11 = this.add.image(0, 0, "box").setScale(0.243);
 
+        this.box13 = this.physics.add.image(470, 240 , "box").setScale(0.07);
+        const tinyBoxW = this.box13.displayWidth + 1
+        this.box14 = this.physics.add.image(this.sys.game.config.width - 470, 240 , "box").setScale(0.07);
+        this.box15 = this.physics.add.image(this.sys.game.config.width - 470 - tinyBoxW , 240 , "box").setScale(0.07);
+        this.box16 = this.physics.add.image(this.sys.game.config.width - 470 - tinyBoxW * 2, 240 , "box").setScale(0.07);
+        this.box17 = this.physics.add.image(this.sys.game.config.width - 470 - tinyBoxW * 3, 240 , "box").setScale(0.07);
+        this.box18 = this.physics.add.image(this.sys.game.config.width - 470 - tinyBoxW * 4, 240 , "box").setScale(0.07);
+        this.box19 = this.physics.add.image(this.sys.game.config.width - 470 - tinyBoxW * 5, 240 , "box").setScale(0.07);
+        this.box20 = this.physics.add.image(this.sys.game.config.width - 470 - tinyBoxW * 6, 240 , "box").setScale(0.07);
+        this.box21 = this.physics.add.image(this.sys.game.config.width - 470 - tinyBoxW * 7, 240 , "box").setScale(0.07);
+        this.box22 = this.physics.add.image(this.sys.game.config.width - 470 - tinyBoxW * 8, 240 , "box").setScale(0.07);
+        this.box23 = this.physics.add.image(this.sys.game.config.width - 470 - tinyBoxW * 9, 240 , "box").setScale(0.07);
+        this.box24 = this.physics.add.image(this.sys.game.config.width - 470 - tinyBoxW * 10, 240 , "box").setScale(0.07);
+        this.box25 = this.physics.add.image(this.sys.game.config.width - 470 - tinyBoxW * 11, 240 , "box").setScale(0.07);
+        this.box26 = this.physics.add.image(this.sys.game.config.width - 470 - tinyBoxW * 12, 240 , "box").setScale(0.07);
+        this.box27 = this.physics.add.image(this.sys.game.config.width - 470 - tinyBoxW * 13, 240 , "box").setScale(0.07);
+        this.box28 = this.physics.add.image(this.sys.game.config.width - 470 - tinyBoxW * 14, 240 , "box").setScale(0.07);
+        this.box29 = this.physics.add.image(this.sys.game.config.width - 470 - tinyBoxW * 15, 240 , "box").setScale(0.07);
+        
+
         this.tralalero1 = this.physics.add.image(0, 0, "tralalero").setScale(.3);
         this.tralalero2 = this.physics.add.image(0, 0, "tralalero").setScale(.3);
         this.tralalero3 = this.physics.add.image(0, 0, "tralalero").setScale(.3);
@@ -103,13 +129,14 @@ class Nivel1 extends Phaser.Scene {
     ];
     
     bombardiroPositions.forEach(pos => {
-        const bombardiro = this.bombardiros.create(pos.x, pos.y, "bombardiro")
+        const bombardiro = this.bombardiros.create(pos.x, pos.y, "gussini")
             .setScale(0.2)
             .refreshBody(); // Actualiza el cuerpo físico
         
         // Asigna velocidad inicial aleatoria para variedad
         const speed = this.bombardiroSpeed
         bombardiro.body.setVelocityX(-speed);
+        bombardiro.flipX= true 
     });
         this.aim = this.add.image(this.sys.game.config.width/2, this.sys.game.config.height/2, "aim0").setScale(.03);
 
@@ -144,6 +171,12 @@ class Nivel1 extends Phaser.Scene {
         this.destroyTralalero,
         null,
         this);
+
+        this.physics.add.collider(this.bullets,[this.box13,this.box14,this.box15,this.box16,
+            this.box17,this.box18,this.box19,this.box20,this.box21,this.box22,this.box23,
+            this.box24,this.box25,this.box26,this.box27,this.box28,this.box29
+        ],
+    this.destroyyy,null,this)
 
         this.physics.add.collider(this.glorbos,this.box12,this.destroyGLorbo,null,this)
         
@@ -196,6 +229,20 @@ class Nivel1 extends Phaser.Scene {
 }
 
 
+destroyyy(bullet, target) {
+    if (bullet) {
+        bullet.destroy(); // Destruye la bala al impactar
+        this.activeBullet = null; // Limpia la referencia
+    }
+
+    if (target) {
+        target.destroy(); // Destruye el objeto si es necesario
+    }
+
+    this.BombardiDestroyed.play({volume:0.6});
+    
+}
+
 destroy(bullet, target) {
     if (bullet) {
         bullet.destroy(); // Destruye la bala al impactar
@@ -235,18 +282,18 @@ rebote(bullet, chimp) {
 }
 
 moveBombardiro(bombardiro) {
+    
     if (!bombardiro.active) return;
 
-    // Cambia de dirección si alcanza los límites
     if (bombardiro.x <= this.minX) {
         bombardiro.body.setVelocityX(this.bombardiroSpeed);
-        bombardiro.flipX = true // Mover derecha
+        bombardiro.flipX = false 
     } 
     else if (bombardiro.x >= this.maxX) {
         bombardiro.body.setVelocityX(-this.bombardiroSpeed);
-        bombardiro.flipX= false // Mover izquierda
+        bombardiro.flipX= true 
     }
-    if (Phaser.Math.Between(1, 300) <= 1) {
+    if (Phaser.Math.Between(1, 240) <= 1) {
         this.dropGlorbo(bombardiro);
     }
 }
@@ -379,12 +426,11 @@ this.bombardiros.getChildren().forEach(bombardiro => {
 
         if(this.bombardirosKilled == 3){
             this.time.delayedCall(1111,()=>{
-                this.upgradee.play();
-                this.scene.add("Nivel2", new Nivel2)
-                this.scene.start("Nivel2",{
-                    score:this.Points
-                })
+
+                this.scene.add("WinScene", new Win)
+                this.scene.start("WinScene")
                 this.bgsound.stop();
+
             })
         }
 
@@ -423,4 +469,4 @@ this.bombardiros.getChildren().forEach(bombardiro => {
     }
 }
 
-export default Nivel1;
+export default Nivel2;

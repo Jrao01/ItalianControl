@@ -1,13 +1,17 @@
 import Nivel1 from "./scene1.js"
+import GameOver from "./gameOver.js"
 
 const config = {
     width: window.innerWidth,
     height: window.innerHeight,
     parent: "container",
     type: Phaser.AUTO,
-    scene: [
-        Nivel1
-    ],physics:{
+    scene: {
+        preload: preload,
+        create: create,
+        update: update
+    }
+,physics:{
         default: "arcade",
         arcade: {
             gravity:{
@@ -28,6 +32,7 @@ let boxWidth
 let landscapeWidth
 let miniboxW
 function preload() {
+    this.load.font('titulo', './assets/Radiantantique.ttf');
     console.log("soy preload");
     this.load.image("bondito", "./assets/bobrito.png");
     this.load.image("land", "./assets/landscape.png");
@@ -35,10 +40,17 @@ function preload() {
     this.load.image("tralalero","./assets/tralalero.png")
     this.load.image("aim0","./assets/aim2.png" );
     this.load.image("chimpanzini","./assets/chimpanzini.png")
+    this.load.image("bombardiro","./assets/bombardiro.png");
+    this.load.image("bombardini","./assets/bombardini.png");
+    this.load.image("glorbo","./assets/glorbo.png")
+    this.load.audio("start","./assets/Intro.mp3")
+
 }
 
 function create() {
-    // Fondo centrado
+    
+    this.bgSound = this.sound.add("start",{loop:true});
+    this.bgSound.play();
     this.land = this.add.image(this.scale.width / 2.4, this.scale.height / 2, "land");
     this.box12 = this.add.image(0, 0, "box").setScale(2.187);
     
@@ -47,16 +59,6 @@ function create() {
     this.chimp1 = this.add.image(0,0,"chimpanzini").setScale(.9)
     this.chimp2 = this.add.image(0,0,"chimpanzini").setScale(.9)
 
-    this.physics.world.enable([this.chimp1, this.chimp2]);
-    
-    // Configurar propiedades de movimiento
-    this.chimpSpeed = 150; // Velocidad de movimiento (píxeles por segundo)
-    this.respawnDelay = 2000; // Tiempo de espera antes de reaparecer (ms)
-    
-    // Iniciar el movimiento de los chimpancés
-    startChimpMovement.call(this);
-
-    // Cajas en las esquinas inferiores
     this.box1 = this.add.image(0, 0, "box").setScale(0.4);
     this.box2 = this.add.image(0, 0, "box").setScale(0.4);
     this.box3 = this.add.image(0, 0, "box").setScale(0.243);
@@ -70,17 +72,23 @@ function create() {
     this.box11 = this.add.image(0, 0, "box").setScale(0.243);
     this.tralalero1 = this.add.image(0,0,"tralalero").setScale(.3)
     this.tralalero2 = this.add.image(0,0,"tralalero").setScale(.3)
+    this.glorbo1 = this.add.image(0,0,"glorbo").setScale(.2)
+    this.glorbo2 = this.add.image(0,0,"glorbo").setScale(.2)
     this.tralalero3 = this.add.image(0,0,"tralalero").setScale(.3)
-    this.tralalero4 = this.add.image(0,0,"tralalero").setScale(.3)
-    this.tralalero5 = this.add.image(0,0,"tralalero").setScale(.3)
+    //this.tralalero4 = this.add.image(0,0,"tralalero").setScale(.3)
+    //this.tralalero5 = this.add.image(0,0,"tralalero").setScale(.3)
     this.tralalero6 = this.add.image(0,0,"tralalero").setScale(.3)
     this.tralalero7 = this.add.image(0,0,"tralalero").setScale(.3)
     this.tralalero8 = this.add.image(0,0,"tralalero").setScale(.3)
-    this.aim = this.add.image(this.scale.width/2,this.scale.height/2,"aim0").setScale(.03)
+    this.bombardiro1 = this.add.image(0,0,"bombardiro").setScale(.4)
+    this.bombardiro2 = this.add.image(0,0,"bombardiro").setScale(.4)
+    this.bombardini1 = this.add.image(0,0,"bombardini").setScale(.4)
+    this.bombardini2 = this.add.image(0,0,"bombardini").setScale(.4)
+
     this.tralalero1.flipX = true
     this.tralalero2.flipX = true
     this.tralalero3.flipX = true
-    this.tralalero4.flipX = true
+    this.glorbo1.flipX = true
     boxWidth = this.box1.displayWidth * 2;
     console.log(boxWidth);
     landscapeWidth = this.land.displayWidth - boxWidth;
@@ -88,139 +96,67 @@ function create() {
     //miniboxW = landscapeWidth/8
     miniboxW = this.box3.displayWidth;
     console.log(miniboxW);
+    // textooosss
+const title = this.add.text(this.sys.game.config.width/2, 300, 'ITALIAN\nMISSION', {
+        fontSize: 120,
+        fontFamily: 'titulo',
+        color: '#000000',
+        align: 'center'
+    }).setOrigin(0.5);
+
+    const press = this.add.text(this.sys.game.config.width/2, this.sys.game.config.height - 55, 'PRESS SPACE\nTO START', {
+        fontSize: 45,
+        fontFamily: 'titulo',
+        color: '#000000',
+        align: 'center'
+    }).setOrigin(0.5);
+
+    const by = this.add.text(34,this.sys.game.config.height - 18, 'Developed by Coding JAR',{
+        fontSize: 10,
+        color: '#000000',
+        align: 'center'
+    })
+
+    this.tweens.add({
+        targets: press ,
+        duration:1000,
+        y:this.sys.game.config.height - 65,
+        repeat: -1,
+        yoyo: true,
+        ease:'Power1'
+    })
 
     // Ajusta las posiciones iniciales
     updateBoxPositions.call(this);
-    
+
     // Escucha el evento de cambio de tamaño
-    this.scale.on("resize", resize, this);
     this.cursor = this.input.keyboard.createCursorKeys();
     console.log(this.cursor)
     console.log("soy create");
-    this
+    console.log(this.cursor.space)
 }
 
 function update(time, delta) {
-    // console.log(delta); // Puedes dejarlo si lo necesitas
-    //this.bondito.angle++;
-    //this.bondito.y++;
-    //console.log("-----------------------");
-    //console.log(this.bondito.displayHeight);
-    if(this.cursor.right.isDown){
-        this.aim.x = this.aim.x + 12
-    }
-    
-    if(this.cursor.left.isDown){
-        this.aim.x = this.aim.x - 12
-    }
-    
-    if(this.cursor.down.isDown){
-        this.aim.y = this.aim.y + 12
+
+    if(this.cursor.space.isDown){
+        console.log("presionaste")
+        this.scene.add("Nivel1", new Nivel1)
+        this.scene.start("Nivel1",{
+            score:100
+        })
+        this.bgSound.stop();
     }
 
-    if(this.cursor.up.isDown){
-        this.aim.y = this.aim.y  - 12
-    }else {}
-    moveChimps.call(this, delta);
+    if(this.cursor.shift.isDown){
+        console.log("yendo a pantalla final");
+        this.scene.add("GameOver", new GameOver)
+        this.scene.start("GameOver");
+        this.bgSound.stop();
+    }
+
+
 }
 
-function startChimpMovement() {
-    // Posición inicial (justo debajo de las cajas)
-    const padding = 102;
-    const boxY = this.scale.height - 100;
-    
-    this.chimp1.y = boxY + this.chimp1.displayHeight;
-    this.chimp2.y = boxY + this.chimp2.displayHeight;
-    
-    this.chimp1.x = padding;
-    this.chimp2.x = this.scale.width - padding;
-    
-    this.chimp1.visible = true;
-    this.chimp2.visible = true;
-    
-    // Estado de los chimpancés
-    this.chimpState = {
-        chimp1: { moving: true, respawnTimer: 0 },
-        chimp2: { moving: true, respawnTimer: 0 }
-    };
-}
-
-function moveChimps(delta) {
-    const boxY = this.scale.height - 100;
-    const padding = 102;
-    
-    // Mover chimp1
-    if (this.chimpState.chimp1.moving) {
-        this.chimp1.y -= this.chimpSpeed * (delta / 1000);
-        
-        // Verificar si ha salido de la pantalla
-        if (this.chimp1.y < -this.chimp1.displayHeight) {
-            this.chimp1.visible = false;
-            this.chimpState.chimp1.moving = false;
-            this.chimpState.chimp1.respawnTimer = this.respawnDelay;
-        }
-    } else {
-        // Contar tiempo para respawn
-        this.chimpState.chimp1.respawnTimer -= delta;
-        if (this.chimpState.chimp1.respawnTimer <= 0) {
-            this.chimp1.y = boxY + this.chimp1.displayHeight;
-            this.chimp1.x = padding;
-            this.chimp1.visible = true;
-            this.chimpState.chimp1.moving = true;
-        }
-    }
-    
-    // Mover chimp2 (misma lógica)
-    if (this.chimpState.chimp2.moving) {
-        this.chimp2.y -= this.chimpSpeed * (delta / 1000);
-        
-        if (this.chimp2.y < -this.chimp2.displayHeight) {
-            this.chimp2.visible = false;
-            this.chimpState.chimp2.moving = false;
-            this.chimpState.chimp2.respawnTimer = this.respawnDelay;
-        }
-    } else {
-        this.chimpState.chimp2.respawnTimer -= delta;
-        if (this.chimpState.chimp2.respawnTimer <= 0) {
-            this.chimp2.y = boxY + this.chimp2.displayHeight;
-            this.chimp2.x = this.scale.width - padding;
-            this.chimp2.visible = true;
-            this.chimpState.chimp2.moving = true;
-        }
-    }
-}
-
-
-function resize(gameSize) {
-    // Actualiza el tamaño del juego
-    this.scale.setGameSize(gameSize.width, gameSize.height);
-    
-    // Reubica el fondo y el personaje
-    //this.land.setPosition(this.scale.width / 2, this.scale.height / 2);
-    //this.bondito.setPosition(this.scale.width / 2, this.scale.height - 200);
-    
-    // Reubica las cajas
-    updateBoxPositions.call(this);
-
-    if (this.chimpState) {
-        const boxY = this.scale.height - 100;
-        const padding = 102;
-        
-        if (this.chimpState.chimp1.moving) {
-            this.chimp1.x = padding;
-        } else {
-            this.chimp1.x = padding;
-            this.chimp1.y = boxY + this.chimp1.displayHeight;
-        }
-        
-        if (this.chimpState.chimp2.moving) {
-            this.chimp2.x = this.scale.width - padding;
-        } else {
-            this.chimp2.x = this.scale.width - padding;
-            this.chimp2.y = boxY + this.chimp2.displayHeight;
-        }
-    }
-}
 
 function updateBoxPositions() {
     const padding = 102; // Espacio desde el borde
@@ -245,13 +181,20 @@ function updateBoxPositions() {
     this.tralalero1.setPosition(boxXmini, tralaH)
     this.tralalero2.setPosition(boxXmini + miniboxW, tralaH)
     this.tralalero3.setPosition(boxXmini + miniboxW*2, tralaH)
-    this.tralalero4.setPosition(boxXmini + miniboxW*3, tralaH)
-    this.tralalero5.setPosition(boxXmini + miniboxW*5, tralaH)
+    this.glorbo1.setPosition(boxXmini + miniboxW*3, tralaH + 15)
+    this.glorbo2.setPosition(boxXmini + miniboxW*5, tralaH + 15)
     this.tralalero6.setPosition(boxXmini + miniboxW*6, tralaH)
     this.tralalero7.setPosition(boxXmini + miniboxW*7, tralaH)
     this.tralalero8.setPosition(boxXmini + miniboxW*8, tralaH)
 
-    this.chimp1.setPosition(padding,boxY)
-    this.chimp2.setPosition(this.scale.width - padding,boxY)
+    this.bombardiro1.setPosition(260,80,"bombardiro")
+    this.bombardiro1.flipX = true;
+    this.bombardiro2    .setPosition(this.scale.width - 260 ,80,"bombardiro")
+    this.bombardini1.setPosition(520,100,"bombardini")
+    this.bombardini2.setPosition(this.scale.width - 520, 100 ,"bombardini")
+    this.bombardini2.flipX = true;
+
+    this.chimp1.setPosition(padding,boxY-240)
+    this.chimp2.setPosition(this.scale.width - padding,boxY-240)
     this.chimp2.flipX = true
 }
