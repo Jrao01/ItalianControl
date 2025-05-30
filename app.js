@@ -11,5 +11,7 @@ app.get('/',(req,res)=>{
 });
 app.listen(port,()=>{
 console.log(`Servidor iniciado http://localhost:${port}`);
+	console.log("Creado por Julian Amer 30336715")
+	console.log("Creado por Cristopher Gomez 28166561")
 });
 
